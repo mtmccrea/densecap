@@ -14,7 +14,7 @@ vis_utils.WAD_COLORS = {
   {157, 175, 255}, -- Light blue
   {41,  208, 208}, -- Cyan
   {255, 146, 51 }, -- Orange
-  {255, 238, 51 }, -- Yellow
+  {255, 216, 73 }, -- Yellow
   {233, 222, 187}, -- Tan
   {255, 205, 243}, -- Pink
   {0,   0,   0  }, -- Black
@@ -43,7 +43,7 @@ Returns:
 --]]
 function vis_utils.densecap_draw(img, boxes, captions, options)
   local img = img:clone()
-  
+
   local H, W = img:size(2), img:size(3)
   local N = boxes:size(1)
 
@@ -53,17 +53,31 @@ function vis_utils.densecap_draw(img, boxes, captions, options)
 
   local text_img = img:clone():zero()
 
+  --https://github.com/torch/image/blob/master/doc/drawing.md
   for i = 1, N do
     local rgb = vis_utils.WAD_COLORS[i % #vis_utils.WAD_COLORS + 1]
     local rgb_255 = {255 * rgb[1], 255 * rgb[2], 255 * rgb[3]}
     vis_utils.draw_box(img, boxes[i], rgb, box_width)
-    local text_opt = {
-      inplace=true,
-      size=text_size,
-      color=rgb_255,
-    }
+
     local x = boxes[{i, 1}] + box_width + 1
     local y = boxes[{i, 2}] + box_width + 1
+    --settings for the colored box underlying the text
+    local text_opt_bg = {
+      inplace=true,
+      size=text_size,
+      color={rgb[1], rgb[2], rgb[3]},
+      bg={rgb[1], rgb[2], rgb[3]},
+    }
+    --settings for the colored text
+    local text_opt = {
+        inplace=true,
+        size=text_size,
+        color=rgb_255,
+    }
+
+    local ok, err = pcall(function()
+      image.drawText(img, captions[i], x, y, text_opt_bg)
+    end)
     local ok, err = pcall(function()
       image.drawText(text_img, captions[i], x, y, text_opt)
     end)
@@ -71,11 +85,18 @@ function vis_utils.densecap_draw(img, boxes, captions, options)
       print('drawText out of bounds: ', x, y, W, H)
     end
   end
+  -- scale pixel values to 0>1
   text_img:div(255)
+  -- force txt to white
+  text_img[torch.ne(text_img, 0)] = 1
+  -- zero out pixels of target image where text image contains info/colors
+  -- this prepares the addition that follows so multiple texts don't continually add up
   img[torch.ne(text_img, 0)] = 0
+  -- add the text image to the target image
   img:add(text_img)
 
   return img
+  -- return text_img
 end
 
 
@@ -105,7 +126,7 @@ function vis_utils.draw_box(img, box, color, lw)
     img[{c, {top_y1, top_y2}, {top_x1, top_x2}}] = cc
     img[{c, {bottom_y1, bottom_y2}, {top_x1, top_x2}}] = cc
     img[{c, {left_y1, left_y2}, {left_x1, left_x2}}] = cc
-    img[{c, {left_y1, left_y2}, {right_x1, right_x2}}] = cc 
+    img[{c, {left_y1, left_y2}, {right_x1, right_x2}}] = cc
   end
 end
 
