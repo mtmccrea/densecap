@@ -78,11 +78,14 @@ function vis_utils.densecap_draw(img, boxes, captions, options)
     local ok, err = pcall(function()
       image.drawText(img, captions[i], x, y, text_opt_bg)
     end)
+    if not ok then
+      print('drawText out of bounds 1: ', x, y, W, H)
+    end
     local ok, err = pcall(function()
       image.drawText(text_img, captions[i], x, y, text_opt)
     end)
     if not ok then
-      print('drawText out of bounds: ', x, y, W, H)
+      print('drawText out of bounds 2: ', x, y, W, H)
     end
   end
   -- scale pixel values to 0>1
