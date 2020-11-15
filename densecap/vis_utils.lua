@@ -3,21 +3,40 @@ require 'image'
 local vis_utils = {}
 
 -- Some nice colors for drawing colors
+-- vis_utils.WAD_COLORS = {
+--   {173, 35,  25 }, -- Red
+--   {42,  75,  215}, -- Blue
+--   {87,  87,  87 }, -- Dark Gray
+--   {29,  105, 20 }, -- Green
+--   {129, 74,  25 }, -- Brown
+--   -- {160, 160, 160}, -- Light Gray
+--   {129, 197, 122}, -- Light green
+--   {157, 175, 255}, -- Light blue
+--   {41,  208, 208}, -- Cyan
+--   {255, 146, 51 }, -- Orange
+--   {255, 216, 73 }, -- Yellow
+--   {233, 222, 187}, -- Tan
+--   {255, 205, 243}, -- Pink
+--   {1,   1,   1  }, -- Black
+-- }
+
+-- Some nice colors for drawing colors
+-- above * 0.75 to make txt more visible
 vis_utils.WAD_COLORS = {
-  {173, 35,  25 }, -- Red
-  {42,  75,  215}, -- Blue
-  {87,  87,  87 }, -- Dark Gray
-  {29,  105, 20 }, -- Green
-  {129, 74,  25 }, -- Brown
-  -- {160, 160, 160}, -- Light Gray
-  {129, 197, 122}, -- Light green
-  {157, 175, 255}, -- Light blue
-  {41,  208, 208}, -- Cyan
-  {255, 146, 51 }, -- Orange
-  {255, 216, 73 }, -- Yellow
-  {233, 222, 187}, -- Tan
-  {255, 205, 243}, -- Pink
-  {0,   0,   0  }, -- Black
+    {130, 26, 19},
+    {32, 56, 161},
+    {65, 65, 65},
+    {22, 79, 15},
+    {97, 56, 19},
+    {120, 120, 120},
+    {97, 148, 92},
+    {118, 131, 191},
+    {31, 156, 156},
+    {191, 110, 38},
+    {191, 162, 55},
+    {175, 167, 140},
+    {191, 154, 182},
+    {1, 1, 1},
 }
 
 
@@ -123,6 +142,7 @@ function vis_utils.draw_box(img, box, color, lw)
 
   local right_x1 = clamp(x + w - lw, 1, W)
   local right_x2 = clamp(x + w + lw, 1, W)
+
 
   for c = 1, 3 do
     local cc = color[c] / 255
