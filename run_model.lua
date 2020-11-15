@@ -45,7 +45,7 @@ cmd:option('-splits_json', 'info/densecap_splits.json')
 cmd:option('-vg_img_root_dir', '', 'root directory for vg images')
 
 -- Output settings
-cmd:option('-max_images', 100, 'max number of images to process')
+cmd:option('-max_images', 1000, 'max number of images to process')
 cmd:option('-output_dir', '')
     -- these settings are only used if output_dir is not empty
     cmd:option('-num_to_draw', 10, 'max number of predictions per image')
@@ -62,7 +62,6 @@ local opt = cmd:parse(arg)
 
 
 function run_image(model, img_path, opt, dtype)
-
   -- Load, resize, and preprocess image
   local img = image.load(img_path, 3)
   img = image.scale(img, opt.image_size):float()
@@ -72,11 +71,9 @@ function run_image(model, img_path, opt, dtype)
   local vgg_mean = torch.FloatTensor{103.939, 116.779, 123.68}
   vgg_mean = vgg_mean:view(1, 3, 1, 1):expand(1, 3, H, W)
   img_caffe:add(-1, vgg_mean)
-
   -- Run the model forward
   local boxes, scores, captions = model:forward_test(img_caffe:type(dtype))
   local boxes_xywh = box_utils.xcycwh_to_xywh(boxes)
-
   local out = {
     img = img,
     boxes = boxes_xywh,
@@ -157,9 +154,20 @@ model:evaluate()
 local image_paths = get_input_images(opt)
 local num_process = math.min(#image_paths, opt.max_images)
 local results_json = {}
+
 for k=1,num_process do
   local img_path = image_paths[k]
   print(string.format('%d/%d processing image %s', k, num_process, img_path))
+  -- mtm added from above, was segfaulting after a few iterations at 720 size
+  local model = checkpoint.model
+  model:convert(dtype, use_cudnn)
+  model:setTestArgs{
+    rpn_nms_thresh = opt.rpn_nms_thresh,
+    final_nms_thresh = opt.final_nms_thresh,
+    num_proposals = opt.num_proposals,
+  }
+  model:evaluate()
+
   -- run the model on the image and obtain results
   local result = run_image(model, img_path, opt, dtype)
   -- handle output serialization: either to directory or for pretty html vis
