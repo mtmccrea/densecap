@@ -71,6 +71,7 @@ function vis_utils.densecap_draw(img, boxes, captions, options)
   local box_width = options.box_width or 2
 
   local text_img = img:clone():zero()
+  img:zero() -- to output just a black background to fade with source video
 
   --https://github.com/torch/image/blob/master/doc/drawing.md
   for i = 1, N do
