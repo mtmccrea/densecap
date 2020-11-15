@@ -22,6 +22,27 @@ local vis_utils = {}
 
 -- Some nice colors for drawing colors
 -- above * 0.75 to make txt more visible
+    -- for quick scaling of color values in supercollider:
+    -- (
+    -- [
+    --   [173, 35,  25 ],
+    --   [42,  75,  215],
+    --   [87,  87,  87 ],
+    --   [29,  105, 20 ],
+    --   [129, 74,  25 ],
+    --   [160, 160, 160],
+    --   [129, 197, 122],
+    --   [157, 175, 255],
+    --   [41,  208, 208],
+    --   [255, 146, 51 ],
+    --   [255, 216, 73 ],
+    --   [233, 222, 187],
+    --   [255, 205, 243],
+    --   [1,   1,   1  ],
+    -- ] * 0.75
+    -- ).do({|me|
+    -- 	postf("{%, %, %},\n", *me.round.asInteger)
+    -- })
 vis_utils.WAD_COLORS = {
     {130, 26, 19},
     {32, 56, 161},
