@@ -1,4 +1,6 @@
 /data
 *.swp
 /vis/data/*.jpg
+/vis/data/*.png
 /vis/data/*.json
+*.DS_Store
