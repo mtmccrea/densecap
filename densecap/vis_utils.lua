@@ -60,7 +60,6 @@ vis_utils.WAD_COLORS = {
     {1, 1, 1},
 }
 
-
 local function clamp(x, low, high)
   if x < low then
     return low
@@ -94,53 +93,58 @@ function vis_utils.densecap_draw(img, boxes, captions, options)
   local text_img = img:clone():zero()
   img:zero() -- to output just a black background to fade with source video
 
-  --https://github.com/torch/image/blob/master/doc/drawing.md
+  -- --https://github.com/torch/image/blob/master/doc/drawing.md
+  -- for i = 1, N do
+  --   local rgb = vis_utils.WAD_COLORS[i % #vis_utils.WAD_COLORS + 1]
+  --   local rgb_255 = {255 * rgb[1], 255 * rgb[2], 255 * rgb[3]}
+  --   vis_utils.draw_box(img, boxes[i], rgb, box_width)
+  --
+  --   local x = boxes[{i, 1}] + box_width + 1
+  --   local y = boxes[{i, 2}] + box_width + 1
+  --   --settings for the colored box underlying the text
+  --   local text_opt_bg = {
+  --     inplace=true,
+  --     size=text_size,
+  --     color={rgb[1], rgb[2], rgb[3]},
+  --     bg={rgb[1], rgb[2], rgb[3]},
+  --   }
+  --   --settings for the colored text
+  --   local text_opt = {
+  --       inplace=true,
+  --       size=text_size,
+  --       color=rgb_255,
+  --   }
+  --
+  --   local ok, err = pcall(function()
+  --     image.drawText(img, captions[i], x, y, text_opt_bg)
+  --   end)
+  --   if not ok then
+  --     print('drawText out of bounds 1: ', x, y, W, H)
+  --   end
+  --   local ok, err = pcall(function()
+  --     image.drawText(text_img, captions[i], x, y, text_opt)
+  --   end)
+  --   if not ok then
+  --     print('drawText out of bounds 2: ', x, y, W, H)
+  --   end
+  -- end
+  -- -- scale pixel values to 0>1
+  -- text_img:div(255)
+  -- -- force txt to white
+  -- text_img[torch.ne(text_img, 0)] = 1
+  -- -- zero out pixels of target image where text image contains info/colors
+  -- -- this prepares the addition that follows so multiple texts don't continually add up
+  -- img[torch.ne(text_img, 0)] = 0
+  -- -- add the text image to the target image
+  -- img:add(text_img)
+
+  -- this loop for white boxes only
+  -- comment out everything above through the loop below the link
   for i = 1, N do
-    local rgb = vis_utils.WAD_COLORS[i % #vis_utils.WAD_COLORS + 1]
-    local rgb_255 = {255 * rgb[1], 255 * rgb[2], 255 * rgb[3]}
-    vis_utils.draw_box(img, boxes[i], rgb, box_width)
-
-    local x = boxes[{i, 1}] + box_width + 1
-    local y = boxes[{i, 2}] + box_width + 1
-    --settings for the colored box underlying the text
-    local text_opt_bg = {
-      inplace=true,
-      size=text_size,
-      color={rgb[1], rgb[2], rgb[3]},
-      bg={rgb[1], rgb[2], rgb[3]},
-    }
-    --settings for the colored text
-    local text_opt = {
-        inplace=true,
-        size=text_size,
-        color=rgb_255,
-    }
-
-    local ok, err = pcall(function()
-      image.drawText(img, captions[i], x, y, text_opt_bg)
-    end)
-    if not ok then
-      print('drawText out of bounds 1: ', x, y, W, H)
-    end
-    local ok, err = pcall(function()
-      image.drawText(text_img, captions[i], x, y, text_opt)
-    end)
-    if not ok then
-      print('drawText out of bounds 2: ', x, y, W, H)
-    end
+    vis_utils.draw_box(img, boxes[i], {255, 255, 255}, box_width)
   end
-  -- scale pixel values to 0>1
-  text_img:div(255)
-  -- force txt to white
-  text_img[torch.ne(text_img, 0)] = 1
-  -- zero out pixels of target image where text image contains info/colors
-  -- this prepares the addition that follows so multiple texts don't continually add up
-  img[torch.ne(text_img, 0)] = 0
-  -- add the text image to the target image
-  img:add(text_img)
 
   return img
-  -- return text_img
 end
 
 
