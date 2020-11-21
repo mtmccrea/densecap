@@ -3,4 +3,5 @@
 /vis/data/*.jpg
 /vis/data/*.png
 /vis/data/*.json
-*.DS_Store
+/vis/output/*
+*DS_Store
